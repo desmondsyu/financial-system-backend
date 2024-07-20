@@ -24,24 +24,29 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "label_id")
     private Label label;
-    private LocalDateTime created_at;
-    private LocalDateTime transaction_date;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "transaction_date")
+    private LocalDateTime transactionDate;
     private Double amount;
+
+    @Column(name = "customer_notes")
     private String description;
     private Double balance;
 
     public Transaction(Integer id, User user, String hashcode, TransactionGroup transactionGroup, Label label,
-                       LocalDateTime created_at, Double amount, String description, Double balance, LocalDateTime transaction_date) {
+                       LocalDateTime createdAt, Double amount, String description, Double balance, LocalDateTime transactionDate) {
         this.id = id;
         this.user = user;
         this.hashcode = hashcode;
         this.transactionGroup = transactionGroup;
         this.label = label;
-        this.created_at = created_at;
+        this.createdAt = createdAt;
         this.amount = amount;
         this.description = description;
         this.balance = balance;
-        this.transaction_date = transaction_date;
+        this.transactionDate = transactionDate;
     }
 
     public Transaction() {
@@ -87,12 +92,12 @@ public class Transaction {
         this.label = label;
     }
 
-    public LocalDateTime getCreated_at() {
-        return created_at;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(LocalDateTime created_at) {
+        this.createdAt = created_at;
     }
 
     public Double getAmount() {
@@ -119,11 +124,11 @@ public class Transaction {
         this.balance = balance;
     }
 
-    public LocalDateTime getTransaction_date() {
-        return transaction_date;
+    public LocalDateTime getTransactionDate() {
+        return transactionDate;
     }
 
-    public void setTransaction_date(LocalDateTime transaction_date) {
-        this.transaction_date = transaction_date;
+    public void setTransactionDate(LocalDateTime transaction_date) {
+        this.transactionDate = transaction_date;
     }
 }
