@@ -1,21 +1,37 @@
 package com.vitalysukhinin.financial_system.entities;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
 public class Transaction {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "tran_id")
     private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
     private String hashcode;
+
+    @ManyToOne
+    @JoinColumn(name = "tran_group_id")
     private TransactionGroup transactionGroup;
+
+    @ManyToOne
+    @JoinColumn(name = "label_id")
     private Label label;
     private LocalDateTime created_at;
+    private LocalDateTime transaction_date;
     private Double amount;
     private String description;
     private Double balance;
 
     public Transaction(Integer id, User user, String hashcode, TransactionGroup transactionGroup, Label label,
-                       LocalDateTime created_at, Double amount, String description, Double balance) {
+                       LocalDateTime created_at, Double amount, String description, Double balance, LocalDateTime transaction_date) {
         this.id = id;
         this.user = user;
         this.hashcode = hashcode;
@@ -25,6 +41,7 @@ public class Transaction {
         this.amount = amount;
         this.description = description;
         this.balance = balance;
+        this.transaction_date = transaction_date;
     }
 
     public Transaction() {
@@ -100,5 +117,13 @@ public class Transaction {
 
     public void setBalance(Double balance) {
         this.balance = balance;
+    }
+
+    public LocalDateTime getTransaction_date() {
+        return transaction_date;
+    }
+
+    public void setTransaction_date(LocalDateTime transaction_date) {
+        this.transaction_date = transaction_date;
     }
 }

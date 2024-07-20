@@ -1,16 +1,30 @@
 package com.vitalysukhinin.financial_system.entities;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
+@Entity
 public class User {
 
+    @Id
+    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String username;
     private String password;
     private LocalDateTime dob;
     private String email;
+    @Column(name = "Mstatus", length = 50)
     private String mStatus;
     private boolean active;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<TransactionGroup> userTransactionGroups;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Transaction> userTransactions;
 
     public User(Integer id, String username, String password, LocalDateTime dob, String email, String mStatus, boolean active) {
         this.id = id;

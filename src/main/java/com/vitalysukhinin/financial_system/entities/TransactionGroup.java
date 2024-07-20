@@ -1,10 +1,27 @@
 package com.vitalysukhinin.financial_system.entities;
 
+import jakarta.persistence.*;
+
+import java.util.Set;
+
+@Entity
+@Table(name = "transaction_group")
 public class TransactionGroup {
+
+    @Id
     private Integer id;
     private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "type_id", nullable = false)
     private TransactionType transactionType;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "transactionGroup", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Transaction> transactions;
 
     public TransactionGroup(Integer id, String name, TransactionType transactionType, User user) {
         this.id = id;
