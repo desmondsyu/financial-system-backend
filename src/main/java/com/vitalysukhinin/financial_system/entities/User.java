@@ -21,7 +21,7 @@ public class User {
     private boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<TransactionGroup> userTransactionGroups;
+    private Set<TransactionGroup> userTransactionGroupResponses;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Transaction> userTransactions;

@@ -9,11 +9,12 @@ import java.util.Set;
 public class TransactionType {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
 
     @OneToMany(mappedBy = "transactionType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<TransactionGroup> transactionGroups;
+    private Set<TransactionGroup> transactionGroupResponses;
 
     public TransactionType(Integer id, String name) {
         this.id = id;

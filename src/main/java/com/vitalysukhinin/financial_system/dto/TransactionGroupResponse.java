@@ -1,37 +1,22 @@
-package com.vitalysukhinin.financial_system.entities;
+package com.vitalysukhinin.financial_system.dto;
 
-import jakarta.persistence.*;
+import com.vitalysukhinin.financial_system.entities.TransactionType;
 
-import java.util.Set;
-
-@Entity
-@Table(name = "transaction_group")
-public class TransactionGroup {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class TransactionGroupResponse {
     private Integer id;
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "type_id", nullable = false)
     private TransactionType transactionType;
+    private UserSimple user;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @OneToMany(mappedBy = "transactionGroup", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Transaction> transactions;
-
-    public TransactionGroup(Integer id, String name, TransactionType transactionType, User user) {
+    public TransactionGroupResponse(Integer id, String name, TransactionType transactionType, UserSimple user) {
         this.id = id;
         this.name = name;
         this.transactionType = transactionType;
         this.user = user;
     }
 
-    public TransactionGroup() {}
+    public TransactionGroupResponse() {
+    }
 
     public Integer getId() {
         return id;
@@ -57,11 +42,11 @@ public class TransactionGroup {
         this.transactionType = transactionType;
     }
 
-    public User getUser() {
+    public UserSimple getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserSimple user) {
         this.user = user;
     }
 }

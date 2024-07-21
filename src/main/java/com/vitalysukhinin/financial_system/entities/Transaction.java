@@ -80,8 +80,8 @@ public class Transaction {
         return transactionGroup;
     }
 
-    public void setTransactionGroup(TransactionGroup transactionGroup) {
-        this.transactionGroup = transactionGroup;
+    public void setTransactionGroup(TransactionGroup transactionGroupResponse) {
+        this.transactionGroup = transactionGroupResponse;
     }
 
     public Label getLabel() {
