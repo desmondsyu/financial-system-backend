@@ -3,7 +3,6 @@ package com.vitalysukhinin.financial_system.services;
 import com.vitalysukhinin.financial_system.entities.Transaction;
 import com.vitalysukhinin.financial_system.repositories.UserRepository;
 import jakarta.persistence.criteria.Predicate;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

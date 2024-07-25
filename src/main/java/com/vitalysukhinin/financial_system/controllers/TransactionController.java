@@ -50,10 +50,9 @@ public class TransactionController {
             @RequestParam (required = false)String group,
             Authentication authentication)
     {
-        return null;
-//        return transactionService.getTransactionsWithCriteria(
-//                authentication.getName(), from, to ,label, type, group
-//        );
+        return transactionService.getTransactionsWithCriteria(
+               authentication.getName(), from, to ,label, type, group
+        );
     }
 
     @PutMapping

@@ -8,6 +8,8 @@ import com.vitalysukhinin.financial_system.entities.User;
 import com.vitalysukhinin.financial_system.repositories.TransactionRepository;
 import com.vitalysukhinin.financial_system.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -86,10 +88,8 @@ public class TransactionService {
         }
         return result;
     }
-//    public List<Transaction> getTransactionsWithCriteria(String name, Date from, Date to, String label, Integer type, String group)
-//    {
-//        TransactionRepository transactionRepository = this.transactionRepository;
-//        return transactionRepository.findAll(TransactionSearchFilter.filters(name, from, to, label, type, group));
-//
-//    }
+    public List<Transaction> getTransactionsWithCriteria(String name, Date from, Date to, String label, Integer type, String group) {
+        Specification<Transaction> specification = TransactionSearchFilter.filters(name, from, to, label, type, group);
+        return transactionRepository.findAll(specification);
+    }
 }
