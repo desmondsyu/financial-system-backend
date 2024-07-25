@@ -3,7 +3,6 @@ package com.vitalysukhinin.financial_system.services;
 import com.vitalysukhinin.financial_system.dto.TransactionGroupResponse;
 import com.vitalysukhinin.financial_system.dto.TransactionResponse;
 import com.vitalysukhinin.financial_system.dto.UserSimple;
-import com.vitalysukhinin.financial_system.entities.Label;
 import com.vitalysukhinin.financial_system.entities.Transaction;
 import com.vitalysukhinin.financial_system.entities.User;
 import com.vitalysukhinin.financial_system.repositories.TransactionRepository;
@@ -78,24 +77,5 @@ public class TransactionService {
             result = Optional.of(savedTransaction);
         }
         return result;
-    }
-    public List<Transaction> getTransactionsWithCriteria(User user, Optional<Date> from, Optional<Date> to, Optional<Label> label, Optional<TransactionGroupResponse> transactionGroupID) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Transaction> criteriaQuery = criteriaBuilder.createQuery(Transaction.class);
-        Root<Transaction> transactionRoot = criteriaQuery.from(Transaction.class);
-
-        List<Predicate> predicates = new ArrayList<>();
-
-        predicates.add(criteriaBuilder.equal(transactionRoot.get("user"), user.getId()));
-        label.ifPresent(value -> predicates.add(criteriaBuilder.equal(transactionRoot.get("label"), value.getId())));
-        from.ifPresent(date -> predicates.add(criteriaBuilder.greaterThanOrEqualTo(transactionRoot.get("transactionDate"), date)));
-        transactionGroupID.ifPresent(transaction -> predicates.add(criteriaBuilder.equal(transactionRoot.get("transactionGroup"), transactionGroupID.get().getId())));
-        to.ifPresent(date -> predicates.add(criteriaBuilder.lessThanOrEqualTo(transactionRoot.get("transactionDate"), date)));
-
-        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
-
-        TypedQuery<Transaction> typedQuery = entityManager.createQuery(criteriaQuery);
-
-        return typedQuery.getResultList();
     }
 }
