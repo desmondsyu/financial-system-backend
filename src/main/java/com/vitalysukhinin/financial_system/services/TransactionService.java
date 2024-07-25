@@ -7,18 +7,11 @@ import com.vitalysukhinin.financial_system.entities.Transaction;
 import com.vitalysukhinin.financial_system.entities.User;
 import com.vitalysukhinin.financial_system.repositories.TransactionRepository;
 import com.vitalysukhinin.financial_system.repositories.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,8 +21,6 @@ import java.util.Optional;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
-
-    private EntityManager entityManager;
 
     public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
@@ -78,4 +69,27 @@ public class TransactionService {
         }
         return result;
     }
+
+    public void deleteTransaction(Integer id) {
+        transactionRepository.deleteById(id);
+    }
+
+    public Optional<Transaction> updateTransaction(Transaction transaction) {
+        Optional<Transaction> result = Optional.empty();
+        Optional<User> optionalUser = userRepository.findByUsername(transaction.getUser().getUsername());
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            transaction.setUser(user);
+            transaction.getTransactionGroup().setUser(user);
+            Transaction savedTransaction = transactionRepository.save(transaction);
+            result = Optional.of(savedTransaction);
+        }
+        return result;
+    }
+//    public List<Transaction> getTransactionsWithCriteria(String name, Date from, Date to, String label, Integer type, String group)
+//    {
+//        TransactionRepository transactionRepository = this.transactionRepository;
+//        return transactionRepository.findAll(TransactionSearchFilter.filters(name, from, to, label, type, group));
+//
+//    }
 }

@@ -9,9 +9,11 @@ import com.vitalysukhinin.financial_system.repositories.TransactionRepository;
 import com.vitalysukhinin.financial_system.repositories.UserRepository;
 import com.vitalysukhinin.financial_system.services.TransactionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,10 +42,18 @@ public class TransactionController {
         return ResponseEntity.badRequest().build();
     }
     @GetMapping("/criteria-filter")
-    public List<Transaction> getTransactionWithCriteria(@RequestBody TransactionSearchFilter transactionSearchFilter)
+    public List<Transaction> getTransactionWithCriteria(
+            @RequestParam (required = false) Date from,
+            @RequestParam (required = false)Date to,
+            @RequestParam (required = false)String label,
+            @RequestParam (required = false)int type,
+            @RequestParam (required = false)String group,
+            Authentication authentication)
     {
-        return transactionService.getTransactionsWithCriteria(transactionSearchFilter.getUser(), transactionSearchFilter.getFrom()
-                , transactionSearchFilter.getTo(), transactionSearchFilter.getLabel(), transactionSearchFilter.getTransactionGroupResponse());
+        return null;
+//        return transactionService.getTransactionsWithCriteria(
+//                authentication.getName(), from, to ,label, type, group
+//        );
     }
 
     @PutMapping
