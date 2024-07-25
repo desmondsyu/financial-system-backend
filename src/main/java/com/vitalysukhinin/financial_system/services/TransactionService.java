@@ -68,4 +68,21 @@ public class TransactionService {
         }
         return result;
     }
+
+    public void deleteTransaction(Integer id) {
+        transactionRepository.deleteById(id);
+    }
+
+    public Optional<Transaction> updateTransaction(Transaction transaction) {
+        Optional<Transaction> result = Optional.empty();
+        Optional<User> optionalUser = userRepository.findByUsername(transaction.getUser().getUsername());
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            transaction.setUser(user);
+            transaction.getTransactionGroup().setUser(user);
+            Transaction savedTransaction = transactionRepository.save(transaction);
+            result = Optional.of(savedTransaction);
+        }
+        return result;
+    }
 }

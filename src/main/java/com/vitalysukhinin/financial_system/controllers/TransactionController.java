@@ -40,5 +40,20 @@ public class TransactionController {
         return ResponseEntity.badRequest().build();
     }
 
+    @PutMapping
+    public ResponseEntity<Transaction> updateTransaction(@RequestBody Transaction transaction) {
+        Optional<Transaction> result = transactionService.updateTransaction(transaction);
+        if (result.isPresent()) {
+            return ResponseEntity.ok(result.get());
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Integer id) {
+        transactionService.deleteTransaction(id);
+        return ResponseEntity.ok().build();
+    }
+
 
 }
