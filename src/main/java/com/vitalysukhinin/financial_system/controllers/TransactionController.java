@@ -1,21 +1,16 @@
 package com.vitalysukhinin.financial_system.controllers;
 
+import com.vitalysukhinin.financial_system.dto.CustomPage;
 import com.vitalysukhinin.financial_system.dto.TransactionResponse;
-import com.vitalysukhinin.financial_system.dto.UserSimple;
 import com.vitalysukhinin.financial_system.entities.Transaction;
-import com.vitalysukhinin.financial_system.dto.TransactionGroupResponse;
-import com.vitalysukhinin.financial_system.entities.User;
-import com.vitalysukhinin.financial_system.repositories.TransactionRepository;
-import com.vitalysukhinin.financial_system.repositories.UserRepository;
 import com.vitalysukhinin.financial_system.services.TransactionService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -28,11 +23,6 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<TransactionResponse>> getTransactions() {
-        return ResponseEntity.ok(transactionService.getAllTransactions());
-    }
-
     @PostMapping
     public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
         Optional<Transaction> result = transactionService.addTransaction(transaction);
@@ -41,18 +31,20 @@ public class TransactionController {
         }
         return ResponseEntity.badRequest().build();
     }
-    @GetMapping("/criteria-filter")
-    public List<Transaction> getTransactionWithCriteria(
-            @RequestParam (required = false) Date from,
-            @RequestParam (required = false)Date to,
-            @RequestParam (required = false)String label,
-            @RequestParam (required = false)int type,
-            @RequestParam (required = false)String group,
-            Authentication authentication)
+    @GetMapping
+    public ResponseEntity<CustomPage<TransactionResponse>> getTransactions(
+            @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam (required = false) String label,
+            @RequestParam (required = false) Integer type,
+            @RequestParam (required = false) String group,
+            Authentication authentication,
+            Pageable pageable)
     {
-        return transactionService.getTransactionsWithCriteria(
-               authentication.getName(), from, to ,label, type, group
+        CustomPage<TransactionResponse> result = transactionService.getTransactions(
+                authentication.getName(), from, to ,label, type, group, pageable
         );
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping
