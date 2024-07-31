@@ -14,8 +14,8 @@ public class CustomUserDetailsService extends JdbcDaoImpl implements UserDetails
 
     public CustomUserDetailsService(DataSource dataSource) {
         setDataSource(dataSource);
-        setUsersByUsernameQuery("select email, password, active from user where email=?");
-        setAuthoritiesByUsernameQuery("select email, 'ROLE_USER' from user where email=?");
+        setUsersByUsernameQuery("SELECT email, password, active FROM user WHERE email = ?\n");
+        setAuthoritiesByUsernameQuery("select email, 'ROLE_USER' FROM user WHERE email=?");
     }
 
     @Override

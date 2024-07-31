@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "TRANSACTION_GROUP")
+@Table(name = "transaction_group")
 public class TransactionGroup {
 
     @Id
