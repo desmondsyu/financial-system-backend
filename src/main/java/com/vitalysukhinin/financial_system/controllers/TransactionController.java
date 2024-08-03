@@ -6,6 +6,8 @@ import com.vitalysukhinin.financial_system.entities.Transaction;
 import com.vitalysukhinin.financial_system.services.TransactionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +43,32 @@ public class TransactionController {
             Authentication authentication,
             Pageable pageable)
     {
+        System.out.println(authentication.getName());
         CustomPage<TransactionResponse> result = transactionService.getTransactions(
                 authentication.getName(), from, to ,label, type, group, pageable
         );
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(path = "pdf")
+    public ResponseEntity<byte[]> getPdfFile(
+            @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam (required = false) String label,
+            @RequestParam (required = false) Integer type,
+            @RequestParam (required = false) String group,
+            Authentication authentication)
+    {
+
+        byte[] pdfBytes = transactionService.generateUserTransactionPdf(authentication.getName(), from, to, label, type, group);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("filename", "user_transactions.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 
     @PutMapping

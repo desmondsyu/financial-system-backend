@@ -30,17 +30,19 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final LabelRepository labelRepository;
     private final TransactionGroupRepository transactionGroupRepository;
+    private final PdfGenerationService pdfGenerationService;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, TransactionGroupRepository transactionGroupRepository) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, TransactionGroupRepository transactionGroupRepository, PdfGenerationService pdfGenerationService) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.labelRepository = labelRepository;
         this.transactionGroupRepository = transactionGroupRepository;
+        this.pdfGenerationService = pdfGenerationService;
     }
 
     public Optional<Transaction> addTransaction(Transaction transaction) {
         Optional<Transaction> result = Optional.empty();
-        Optional<User> optionalUser = userRepository.findByUsername(transaction.getUser().getUsername());
+        Optional<User> optionalUser = userRepository.findByEmail(transaction.getUser().getEmail());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             transaction.setUser(user);
@@ -66,7 +68,7 @@ public class TransactionService {
 
     public Optional<Transaction> updateTransaction(Transaction transaction) {
         Optional<Transaction> result = Optional.empty();
-        Optional<User> optionalUser = userRepository.findByUsername(transaction.getUser().getUsername());
+        Optional<User> optionalUser = userRepository.findByEmail(transaction.getUser().getEmail());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             transaction.setUser(user);
@@ -77,8 +79,8 @@ public class TransactionService {
         return result;
     }
 
-    public CustomPage<TransactionResponse> getTransactions(String name, LocalDateTime from, LocalDateTime to, String labelName, Integer type, String groupName, Pageable pageable) {
-        User user = userRepository.findByUsername(name).orElse(null);
+    public CustomPage<TransactionResponse> getTransactions(String email, LocalDateTime from, LocalDateTime to, String labelName, Integer type, String groupName, Pageable pageable) {
+        User user = userRepository.findByEmail(email).orElse(null);
         TransactionGroup group = transactionGroupRepository.findByNameAndUser(groupName, user).orElse(null);
         Label label = labelRepository.findByName(labelName).orElse(null);
 
@@ -106,5 +108,21 @@ public class TransactionService {
         response.setTotalElements(transactions.getTotalElements());
         response.setTotalPages(transactions.getTotalPages());
         return response;
+    }
+
+    public List<Transaction> getTransactions(User user, LocalDateTime from, LocalDateTime to, String labelName, Integer type, String groupName) {
+        TransactionGroup group = transactionGroupRepository.findByNameAndUser(groupName, user).orElse(null);
+        Label label = labelRepository.findByName(labelName).orElse(null);
+
+        Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
+        List<Transaction> transactions = transactionRepository.findAll(specification);
+        return transactions;
+    }
+
+    public byte[] generateUserTransactionPdf(String email, LocalDateTime from, LocalDateTime to, String label, Integer type, String group) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        List<Transaction> transactions = getTransactions(user, from, to, label, type, group);
+
+        return pdfGenerationService.generateUserTransactionPdf(user, transactions);
     }
 }
