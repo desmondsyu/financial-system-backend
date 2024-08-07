@@ -16,8 +16,8 @@ public class User {
     private String password;
     private LocalDateTime dob;
     private String email;
-    @Column(name = "Mstatus", length = 50)
-    private String mStatus;
+    @Column( length = 50)
+    private String gender;
     private boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -26,13 +26,13 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Transaction> userTransactions;
 
-    public User(Integer id, String username, String password, LocalDateTime dob, String email, String mStatus, boolean active) {
+    public User(Integer id, String username, String password, LocalDateTime dob, String email, String gender, boolean active) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.dob = dob;
         this.email = email;
-        this.mStatus = mStatus;
+        this.gender = gender;
         this.active = active;
     }
 
@@ -79,12 +79,12 @@ public class User {
         this.email = email;
     }
 
-    public String getmStatus() {
-        return mStatus;
+    public String getGender() {
+        return gender;
     }
 
-    public void setmStatus(String mStatus) {
-        this.mStatus = mStatus;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public boolean isActive() {

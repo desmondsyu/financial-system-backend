@@ -35,6 +35,10 @@ public class Transaction {
     private String description;
     private Double balance;
 
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    private TransactionType type;
+
     public Transaction(Integer id, User user, String hashcode, TransactionGroup transactionGroup, Label label,
                        LocalDateTime createdAt, Double amount, String description, Double balance, LocalDateTime transactionDate) {
         this.id = id;
@@ -130,5 +134,13 @@ public class Transaction {
 
     public void setTransactionDate(LocalDateTime transaction_date) {
         this.transactionDate = transaction_date;
+    }
+
+    public TransactionType getType() {
+        return type;
+    }
+
+    public void setType(TransactionType type) {
+        this.type = type;
     }
 }

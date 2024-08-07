@@ -1,8 +1,11 @@
 package com.vitalysukhinin.financial_system.controllers;
 
 import com.vitalysukhinin.financial_system.entities.Label;
+import com.vitalysukhinin.financial_system.entities.User;
 import com.vitalysukhinin.financial_system.repositories.LabelRepository;
+import com.vitalysukhinin.financial_system.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -15,14 +18,22 @@ import java.util.Optional;
 public class LabelController {
 
     private final LabelRepository labelRepository;
+    private final UserRepository userRepository;
 
-    public LabelController(LabelRepository labelRepository) {
+    public LabelController(LabelRepository labelRepository, UserRepository userRepository) {
         this.labelRepository = labelRepository;
+        this.userRepository = userRepository;
     }
 
+    //TODO Add dto to hide user data
     @GetMapping
-    public ResponseEntity<List<Label>> getLabels() {
-        return ResponseEntity.ok(labelRepository.findAll());
+    public ResponseEntity<List<Label>> getLabels(Authentication auth) {
+        String email = auth.getName();
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            return ResponseEntity.ok(labelRepository.findByUserOrUserIsNull(user.get()));
+        } else
+            return ResponseEntity.notFound().build();
     }
 
     @GetMapping(path = "/{id}")

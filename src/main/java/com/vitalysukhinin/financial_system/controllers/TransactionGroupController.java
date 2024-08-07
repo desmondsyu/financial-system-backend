@@ -22,12 +22,12 @@ public class TransactionGroupController {
         this.transactionGroupRepository = transactionGroupRepository;
         this.userRepository = userRepository;
     }
-
+    //TODO Add dto to hide user data
     @GetMapping
     public ResponseEntity<List<TransactionGroup>> getAllTransactionGroups(Authentication auth) {
         Optional<User> user = userRepository.findByEmail(auth.getName());
         if (user.isPresent())
-            return ResponseEntity.ok(transactionGroupRepository.findAllByUser(user.get()));
+            return ResponseEntity.ok(transactionGroupRepository.findByUserOrUserIsNull(user.get()));
          else
              return ResponseEntity.notFound().build();
     }

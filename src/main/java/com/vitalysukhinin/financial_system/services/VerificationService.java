@@ -29,7 +29,7 @@ public class VerificationService {
                 user.setEmail(email);
                 user.setDob(verification.getDob());
                 user.setActive(true);
-                user.setmStatus(verification.getmStatus());
+                user.setGender(verification.getmStatus());
                 user.setUsername(verification.getUsername());
                 user.setPassword(verification.getPassword());
                 tempUserRepository.delete(verification);
