@@ -26,6 +26,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Transaction> userTransactions;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Label> userLabels;
+
     public User(Integer id, String username, String password, LocalDateTime dob, String email, String gender, boolean active) {
         this.id = id;
         this.username = username;

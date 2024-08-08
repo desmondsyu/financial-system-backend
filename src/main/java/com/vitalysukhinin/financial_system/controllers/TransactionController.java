@@ -40,12 +40,13 @@ public class TransactionController {
             @RequestParam (required = false) String label,
             @RequestParam (required = false) Integer type,
             @RequestParam (required = false) String group,
+            @RequestParam (required = false) Boolean all,
             Authentication authentication,
             Pageable pageable)
     {
         System.out.println(authentication.getName());
         CustomPage<TransactionResponse> result = transactionService.getTransactions(
-                authentication.getName(), from, to ,label, type, group, pageable
+                authentication.getName(), from, to ,label, type, group, all, pageable
         );
         return ResponseEntity.ok(result);
     }

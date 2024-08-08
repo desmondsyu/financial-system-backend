@@ -29,7 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
                                 .requestMatchers(HttpMethod.POST,"/register").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/verify").permitAll()
                                 .anyRequest().authenticated())
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();

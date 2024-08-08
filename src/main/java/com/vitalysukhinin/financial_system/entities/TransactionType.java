@@ -14,7 +14,10 @@ public class TransactionType {
     private String name;
 
     @OneToMany(mappedBy = "transactionType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<TransactionGroup> transactionGroupResponses;
+    private Set<TransactionGroup> transactionGroups;
+
+    @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Transaction> transactions;
 
     public TransactionType(Integer id, String name) {
         this.id = id;

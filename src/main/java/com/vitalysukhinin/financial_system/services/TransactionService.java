@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Transactional
@@ -79,14 +80,32 @@ public class TransactionService {
         return result;
     }
 
-    public CustomPage<TransactionResponse> getTransactions(String email, LocalDateTime from, LocalDateTime to, String labelName, Integer type, String groupName, Pageable pageable) {
+    public CustomPage<TransactionResponse> getTransactions(String email, LocalDateTime from, LocalDateTime to, String labelName, Integer type, String groupName, Boolean all, Pageable pageable) {
         User user = userRepository.findByEmail(email).orElse(null);
         TransactionGroup group = transactionGroupRepository.findByNameAndUser(groupName, user).orElse(null);
         Label label = labelRepository.findByName(labelName).orElse(null);
-
         Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
-        Page<Transaction> transactions = transactionRepository.findAll(specification, pageable);
-        List<TransactionResponse> content = transactions.map(transaction -> new TransactionResponse(
+        CustomPage<TransactionResponse> response = new CustomPage<>();
+        List<TransactionResponse> content;
+        boolean getAll = all == null ? false : all.booleanValue();
+        if (getAll) {
+            List<Transaction> transactions = transactionRepository.findAll(specification);
+            content = transactions.stream().map(convert()).toList();
+            response.setTotalElements(transactions.size());
+        } else {
+            Page<Transaction> transactions = transactionRepository.findAll(specification, pageable);
+            content = transactions.map(convert()).stream().toList();
+            response.setPageNumber(transactions.getNumber());
+            response.setPageSize(transactions.getSize());
+            response.setTotalElements(transactions.getTotalElements());
+            response.setTotalPages(transactions.getTotalPages());
+        }
+        response.setContent(content);
+        return response;
+    }
+
+    private Function<Transaction, TransactionResponse> convert() {
+        return transaction -> new TransactionResponse(
                 new UserSimple(transaction.getUser().getUsername()),
                 transaction.getHashcode(),
                 new TransactionGroupResponse(
@@ -100,14 +119,7 @@ public class TransactionService {
                 transaction.getAmount(),
                 transaction.getDescription(),
                 transaction.getBalance()
-        )).stream().toList();
-        CustomPage<TransactionResponse> response = new CustomPage<>();
-        response.setContent(content);
-        response.setPageNumber(transactions.getNumber());
-        response.setPageSize(transactions.getSize());
-        response.setTotalElements(transactions.getTotalElements());
-        response.setTotalPages(transactions.getTotalPages());
-        return response;
+        );
     }
 
     public List<Transaction> getTransactions(User user, LocalDateTime from, LocalDateTime to, String labelName, Integer type, String groupName) {
