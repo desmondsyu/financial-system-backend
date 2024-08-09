@@ -11,11 +11,13 @@ import com.vitalysukhinin.financial_system.services.EmailService;
 import com.vitalysukhinin.financial_system.services.VerificationService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -55,6 +57,16 @@ public class UserController {
     @GetMapping(path = "/users")
     public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.ok(userRepository.findAll());
+    }
+
+    @DeleteMapping(path = "/users")
+    public ResponseEntity<Void> deleteUser(Authentication authentication) {
+        Optional<User> user = userRepository.findByEmail(authentication.getName());
+        if (user.isPresent())
+            userRepository.delete(user.get());
+        else
+            return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
     }
 
     private String generateRandomToken() {

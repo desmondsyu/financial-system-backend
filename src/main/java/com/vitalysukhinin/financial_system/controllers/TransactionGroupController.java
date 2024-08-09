@@ -1,5 +1,7 @@
 package com.vitalysukhinin.financial_system.controllers;
 
+import com.vitalysukhinin.financial_system.dto.TransactionGroupResponse;
+import com.vitalysukhinin.financial_system.dto.UserSimple;
 import com.vitalysukhinin.financial_system.entities.TransactionGroup;
 import com.vitalysukhinin.financial_system.entities.User;
 import com.vitalysukhinin.financial_system.repositories.TransactionGroupRepository;
@@ -22,12 +24,18 @@ public class TransactionGroupController {
         this.transactionGroupRepository = transactionGroupRepository;
         this.userRepository = userRepository;
     }
-    //TODO Add dto to hide user data
+
     @GetMapping
-    public ResponseEntity<List<TransactionGroup>> getAllTransactionGroups(Authentication auth) {
+    public ResponseEntity<List<TransactionGroupResponse>> getAllTransactionGroups(Authentication auth) {
         Optional<User> user = userRepository.findByEmail(auth.getName());
-        if (user.isPresent())
-            return ResponseEntity.ok(transactionGroupRepository.findByUserOrUserIsNull(user.get()));
+        if (user.isPresent()) {
+            List<TransactionGroup> transactionGroups = transactionGroupRepository.findByUserOrUserIsNull(user.get());
+            List<TransactionGroupResponse> responses = transactionGroups.stream().map(transactionGroup -> new TransactionGroupResponse(
+                    transactionGroup.getId(), transactionGroup.getName(), transactionGroup.getTransactionType(),
+                    transactionGroup.getUser() != null ? new UserSimple(transactionGroup.getUser().getEmail()) : null
+            )).toList();
+            return ResponseEntity.ok(responses);
+        }
          else
              return ResponseEntity.notFound().build();
     }
@@ -42,5 +50,24 @@ public class TransactionGroupController {
             return ResponseEntity.ok(savedTransactionGroup);
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Void> deleteTransactionGroup(@PathVariable Integer id) {
+        transactionGroupRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<TransactionGroup> updateTransactionGroup(Authentication authentication, @RequestBody TransactionGroup transactionGroup) {
+        Optional<User> user = userRepository.findByEmail(authentication.getName());
+        if (user.isPresent()) {
+            if (transactionGroup.getUser() != null)
+                transactionGroup.setUser(user.get());
+            TransactionGroup savedTransactionGroup = transactionGroupRepository.save(transactionGroup);
+            return ResponseEntity.ok(savedTransactionGroup);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

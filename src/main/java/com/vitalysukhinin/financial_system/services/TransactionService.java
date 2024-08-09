@@ -106,13 +106,13 @@ public class TransactionService {
 
     private Function<Transaction, TransactionResponse> convert() {
         return transaction -> new TransactionResponse(
-                new UserSimple(transaction.getUser().getUsername()),
+                new UserSimple(transaction.getUser().getEmail()),
                 transaction.getHashcode(),
                 new TransactionGroupResponse(
                         transaction.getTransactionGroup().getId(),
                         transaction.getTransactionGroup().getName(),
                         transaction.getTransactionGroup().getTransactionType(),
-                        new UserSimple(transaction.getUser().getUsername())
+                        new UserSimple(transaction.getUser().getEmail())
                 ),
                 transaction.getLabel(),
                 transaction.getTransactionDate(),

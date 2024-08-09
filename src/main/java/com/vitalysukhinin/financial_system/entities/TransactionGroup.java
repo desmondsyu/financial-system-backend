@@ -18,7 +18,7 @@ public class TransactionGroup {
     private TransactionType transactionType;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "transactionGroup", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
