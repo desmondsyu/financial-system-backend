@@ -44,6 +44,10 @@ public class UserController {
     @PostMapping(path = "/register")
     public ResponseEntity<Void> registerUser(@RequestBody UserRequest user) {
         String token = generateRandomRegisterToken();
+        Optional<User> userFound = userRepository.findByEmail(user.email());
+        if (userFound.isPresent())
+            return ResponseEntity.badRequest().build();
+
         TempUser tempUser = new TempUser(user.email(), token, LocalDateTime.now().plusMinutes(20), user.username(), passwordEncoder.encode(user.password()),
                 user.mStatus(), user.dob());
         tempUserRepository.save(tempUser);

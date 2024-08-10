@@ -28,6 +28,8 @@ public class WebConfig implements WebMvcConfigurer {
                         auth
                                 .requestMatchers(HttpMethod.POST,"/register").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/verify").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/forgot-password").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/reset-password").permitAll()
                                 .anyRequest().authenticated())
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
