@@ -49,7 +49,7 @@ public class UserController {
             return ResponseEntity.badRequest().build();
 
         TempUser tempUser = new TempUser(user.email(), token, LocalDateTime.now().plusMinutes(20), user.username(), passwordEncoder.encode(user.password()),
-                user.mStatus(), user.dob());
+                user.gender(), user.dob());
         tempUserRepository.save(tempUser);
         emailService.sendVerificationCode(user.email(), token);
         return ResponseEntity.ok().build();

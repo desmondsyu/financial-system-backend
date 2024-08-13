@@ -16,19 +16,19 @@ public class TempUser {
     private LocalDateTime expiryDate;
     private String username;
     private String password;
-    @Column(name = "Mstatus", length = 50)
-    private String mStatus;
+    @Column(length = 50)
+    private String gender;
     private LocalDateTime dob;
 
     public TempUser() {}
 
-    public TempUser(String email, String token, LocalDateTime expiryDate, String username, String password, String mStatus, LocalDateTime dob) {
+    public TempUser(String email, String token, LocalDateTime expiryDate, String username, String password, String gender, LocalDateTime dob) {
         this.email = email;
         this.token = token;
         this.expiryDate = expiryDate;
         this.username = username;
         this.password = password;
-        this.mStatus = mStatus;
+        this.gender = gender;
         this.dob = dob;
     }
 
@@ -80,12 +80,12 @@ public class TempUser {
         this.password = password;
     }
 
-    public String getmStatus() {
-        return mStatus;
+    public String getGender() {
+        return gender;
     }
 
-    public void setmStatus(String mStatus) {
-        this.mStatus = mStatus;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public LocalDateTime getDob() {
