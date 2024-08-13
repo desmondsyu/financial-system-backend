@@ -45,8 +45,12 @@ public class UserController {
     public ResponseEntity<Void> registerUser(@RequestBody UserRequest user) {
         String token = generateRandomRegisterToken();
         Optional<User> userFound = userRepository.findByEmail(user.email());
+        Optional<TempUser> existingUser = tempUserRepository.findByEmail(user.email());
         if (userFound.isPresent())
             return ResponseEntity.badRequest().build();
+
+        if (existingUser.isPresent())
+            tempUserRepository.delete(existingUser.get());
 
         TempUser tempUser = new TempUser(user.email(), token, LocalDateTime.now().plusMinutes(20), user.username(), passwordEncoder.encode(user.password()),
                 user.gender(), user.dob());
