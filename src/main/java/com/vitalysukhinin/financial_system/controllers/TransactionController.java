@@ -26,10 +26,10 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
+    public ResponseEntity<Void> createTransaction(@RequestBody Transaction transaction) {
         Optional<Transaction> result = transactionService.addTransaction(transaction);
         if (result.isPresent()) {
-            return ResponseEntity.ok(result.get());
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }

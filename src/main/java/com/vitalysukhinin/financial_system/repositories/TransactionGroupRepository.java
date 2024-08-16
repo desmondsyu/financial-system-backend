@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface TransactionGroupRepository extends JpaRepository<TransactionGroup, Integer> {
     List<TransactionGroup> findByUserOrUserIsNull(User user);
-    Optional<TransactionGroup> findByNameAndUser(String name, User user);
+    List<TransactionGroup> findAllByName(String name);
 }

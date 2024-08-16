@@ -86,7 +86,7 @@ public class TransactionService {
 
     public CustomPage<TransactionResponse> getTransactions(String email, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName, Boolean all, Pageable pageable) {
         User user = userRepository.findByEmail(email).orElse(null);
-        TransactionGroup group = transactionGroupRepository.findByNameAndUser(groupName, user).orElse(null);
+        TransactionGroup group = findGroupByName(groupName, email);
         Label label = labelRepository.findByName(labelName).orElse(null);
         TransactionType type = transactionTypeRepository.findById(typeId == null ? -1 : typeId).orElse(null);
         Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
@@ -136,7 +136,7 @@ public class TransactionService {
     }
 
     public List<Transaction> getTransactions(User user, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName) {
-        TransactionGroup group = transactionGroupRepository.findByNameAndUser(groupName, user).orElse(null);
+        TransactionGroup group = findGroupByName(groupName, user.getEmail());
         Label label = labelRepository.findByName(labelName).orElse(null);
         TransactionType type = transactionTypeRepository.findById(typeId).orElse(null);
         Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
@@ -149,5 +149,19 @@ public class TransactionService {
         List<Transaction> transactions = getTransactions(user, from, to, label, type, group);
 
         return pdfGenerationService.generateUserTransactionPdf(user, transactions);
+    }
+
+    private TransactionGroup findGroupByName(String name, String email) {
+        TransactionGroup group = null;
+        List<TransactionGroup> groups = transactionGroupRepository.findAllByName(name);
+        if (!groups.isEmpty()) {
+            for (TransactionGroup transactionGroup : groups) {
+                if (transactionGroup.getUser() == null || transactionGroup.getUser().getEmail().equals(email)) {
+                    group = transactionGroup;
+                    break;
+                }
+            }
+        }
+        return group;
     }
 }
