@@ -5,6 +5,7 @@ import com.vitalysukhinin.financial_system.entities.Label;
 import java.time.LocalDateTime;
 
 public class TransactionResponse {
+    private Integer id;
     private UserSimple user;
     private String hashcode;
     private TransactionGroupResponse transactionGroupResponse;
@@ -14,7 +15,8 @@ public class TransactionResponse {
     private String description;
     private Double balance;
 
-    public TransactionResponse(UserSimple user, String hashcode, TransactionGroupResponse transactionGroupResponse, Label label, LocalDateTime transactionDate, Double amount, String description, Double balance) {
+    public TransactionResponse(Integer id, UserSimple user, String hashcode, TransactionGroupResponse transactionGroupResponse, Label label, LocalDateTime transactionDate, Double amount, String description, Double balance) {
+        this.id = id;
         this.user = user;
         this.hashcode = hashcode;
         this.transactionGroupResponse = transactionGroupResponse;
@@ -26,6 +28,22 @@ public class TransactionResponse {
     }
 
     public TransactionResponse() {
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public TransactionGroupResponse getTransactionGroupResponse() {
+        return transactionGroupResponse;
+    }
+
+    public void setTransactionGroupResponse(TransactionGroupResponse transactionGroupResponse) {
+        this.transactionGroupResponse = transactionGroupResponse;
     }
 
     public UserSimple getUser() {

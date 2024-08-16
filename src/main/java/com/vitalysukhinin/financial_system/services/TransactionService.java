@@ -4,14 +4,8 @@ import com.vitalysukhinin.financial_system.dto.CustomPage;
 import com.vitalysukhinin.financial_system.dto.TransactionGroupResponse;
 import com.vitalysukhinin.financial_system.dto.TransactionResponse;
 import com.vitalysukhinin.financial_system.dto.UserSimple;
-import com.vitalysukhinin.financial_system.entities.Label;
-import com.vitalysukhinin.financial_system.entities.Transaction;
-import com.vitalysukhinin.financial_system.entities.TransactionGroup;
-import com.vitalysukhinin.financial_system.entities.User;
-import com.vitalysukhinin.financial_system.repositories.LabelRepository;
-import com.vitalysukhinin.financial_system.repositories.TransactionGroupRepository;
-import com.vitalysukhinin.financial_system.repositories.TransactionRepository;
-import com.vitalysukhinin.financial_system.repositories.UserRepository;
+import com.vitalysukhinin.financial_system.entities.*;
+import com.vitalysukhinin.financial_system.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,13 +26,15 @@ public class TransactionService {
     private final LabelRepository labelRepository;
     private final TransactionGroupRepository transactionGroupRepository;
     private final PdfGenerationService pdfGenerationService;
+    private final TransactionTypeRepository transactionTypeRepository;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, TransactionGroupRepository transactionGroupRepository, PdfGenerationService pdfGenerationService) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, TransactionGroupRepository transactionGroupRepository, PdfGenerationService pdfGenerationService, TransactionTypeRepository transactionTypeRepository) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.labelRepository = labelRepository;
         this.transactionGroupRepository = transactionGroupRepository;
         this.pdfGenerationService = pdfGenerationService;
+        this.transactionTypeRepository = transactionTypeRepository;
     }
 
     public Optional<Transaction> addTransaction(Transaction transaction) {
@@ -80,10 +76,11 @@ public class TransactionService {
         return result;
     }
 
-    public CustomPage<TransactionResponse> getTransactions(String email, LocalDateTime from, LocalDateTime to, String labelName, Integer type, String groupName, Boolean all, Pageable pageable) {
+    public CustomPage<TransactionResponse> getTransactions(String email, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName, Boolean all, Pageable pageable) {
         User user = userRepository.findByEmail(email).orElse(null);
         TransactionGroup group = transactionGroupRepository.findByNameAndUser(groupName, user).orElse(null);
         Label label = labelRepository.findByName(labelName).orElse(null);
+        TransactionType type = transactionTypeRepository.findById(typeId == null ? -1 : typeId).orElse(null);
         Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
         CustomPage<TransactionResponse> response = new CustomPage<>();
         List<TransactionResponse> content;
@@ -106,6 +103,7 @@ public class TransactionService {
 
     private Function<Transaction, TransactionResponse> convert() {
         return transaction -> new TransactionResponse(
+                transaction.getId(),
                 new UserSimple(transaction.getUser().getEmail()),
                 transaction.getHashcode(),
                 new TransactionGroupResponse(
@@ -122,10 +120,10 @@ public class TransactionService {
         );
     }
 
-    public List<Transaction> getTransactions(User user, LocalDateTime from, LocalDateTime to, String labelName, Integer type, String groupName) {
+    public List<Transaction> getTransactions(User user, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName) {
         TransactionGroup group = transactionGroupRepository.findByNameAndUser(groupName, user).orElse(null);
         Label label = labelRepository.findByName(labelName).orElse(null);
-
+        TransactionType type = transactionTypeRepository.findById(typeId).orElse(null);
         Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
         List<Transaction> transactions = transactionRepository.findAll(specification);
         return transactions;
