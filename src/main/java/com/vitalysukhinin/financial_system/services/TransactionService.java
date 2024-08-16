@@ -40,7 +40,12 @@ public class TransactionService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             transaction.setUser(user);
-            transaction.getTransactionGroup().setUser(user);
+            User transactionGroupUser;
+            if (transaction.getTransactionGroup().getUser() == null)
+                transactionGroupUser = null;
+            else
+                transactionGroupUser = user;
+            transaction.getTransactionGroup().setUser(transactionGroupUser);
             transaction.setCreatedAt(LocalDateTime.now());
             transaction.setHashcode(
                     String.valueOf(Objects.hash(transaction.getUser(),
@@ -50,6 +55,12 @@ public class TransactionService {
                             transaction.getDescription(),
                             transaction.getLabel()))
             );
+            User transactionLabelUser;
+            if (transaction.getLabel().getUser() == null)
+                transactionLabelUser = null;
+            else
+                transactionLabelUser = user;
+            transaction.getLabel().setUser(transactionLabelUser);
             Transaction savedTransaction = transactionRepository.save(transaction);
             result = Optional.of(savedTransaction);
         }
@@ -119,7 +130,8 @@ public class TransactionService {
                 transaction.getTransactionDate(),
                 transaction.getAmount(),
                 transaction.getDescription(),
-                transaction.getBalance()
+                transaction.getBalance(),
+                transaction.getType()
         );
     }
 

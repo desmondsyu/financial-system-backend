@@ -1,6 +1,7 @@
 package com.vitalysukhinin.financial_system.dto;
 
 import com.vitalysukhinin.financial_system.entities.Label;
+import com.vitalysukhinin.financial_system.entities.TransactionType;
 
 import java.time.LocalDateTime;
 
@@ -14,8 +15,9 @@ public class TransactionResponse {
     private Double amount;
     private String description;
     private Double balance;
+    private TransactionType type;
 
-    public TransactionResponse(Integer id, UserSimple user, String hashcode, TransactionGroupResponse transactionGroupResponse, LabelResponse label, LocalDateTime transactionDate, Double amount, String description, Double balance) {
+    public TransactionResponse(Integer id, UserSimple user, String hashcode, TransactionGroupResponse transactionGroupResponse, LabelResponse label, LocalDateTime transactionDate, Double amount, String description, Double balance, TransactionType type) {
         this.id = id;
         this.user = user;
         this.hashcode = hashcode;
@@ -25,6 +27,7 @@ public class TransactionResponse {
         this.amount = amount;
         this.description = description;
         this.balance = balance;
+        this.type = type;
     }
 
     public TransactionResponse() {
@@ -100,5 +103,13 @@ public class TransactionResponse {
 
     public void setBalance(Double balance) {
         this.balance = balance;
+    }
+
+    public TransactionType getType() {
+        return type;
+    }
+
+    public void setType(TransactionType type) {
+        this.type = type;
     }
 }
