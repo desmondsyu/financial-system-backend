@@ -1,4 +1,3 @@
 package com.vitalysukhinin.financial_system.dto;
 
-public class LabelResponse {
-}
+public record LabelResponse(Integer id, String name, UserSimple user) { }

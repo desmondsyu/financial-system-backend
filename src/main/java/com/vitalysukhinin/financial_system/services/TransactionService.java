@@ -1,9 +1,6 @@
 package com.vitalysukhinin.financial_system.services;
 
-import com.vitalysukhinin.financial_system.dto.CustomPage;
-import com.vitalysukhinin.financial_system.dto.TransactionGroupResponse;
-import com.vitalysukhinin.financial_system.dto.TransactionResponse;
-import com.vitalysukhinin.financial_system.dto.UserSimple;
+import com.vitalysukhinin.financial_system.dto.*;
 import com.vitalysukhinin.financial_system.entities.*;
 import com.vitalysukhinin.financial_system.repositories.*;
 import jakarta.transaction.Transactional;
@@ -106,13 +103,19 @@ public class TransactionService {
                 transaction.getId(),
                 new UserSimple(transaction.getUser().getEmail()),
                 transaction.getHashcode(),
-                new TransactionGroupResponse(
+                transaction.getTransactionGroup() == null ? null :
+                        new TransactionGroupResponse(
                         transaction.getTransactionGroup().getId(),
                         transaction.getTransactionGroup().getName(),
                         transaction.getTransactionGroup().getTransactionType(),
-                        new UserSimple(transaction.getUser().getEmail())
+                        transaction.getTransactionGroup().getUser() == null ? null :
+                            new UserSimple(transaction.getTransactionGroup().getUser().getEmail())
                 ),
-                transaction.getLabel(),
+                transaction.getLabel() == null ? null :
+                        new LabelResponse(transaction.getLabel().getId(),
+                        transaction.getLabel().getName(),
+                        transaction.getLabel().getUser() == null ? null :
+                            new UserSimple(transaction.getLabel().getUser().getEmail())),
                 transaction.getTransactionDate(),
                 transaction.getAmount(),
                 transaction.getDescription(),

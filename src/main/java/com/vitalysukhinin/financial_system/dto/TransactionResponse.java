@@ -9,13 +9,13 @@ public class TransactionResponse {
     private UserSimple user;
     private String hashcode;
     private TransactionGroupResponse transactionGroupResponse;
-    private Label label;
+    private LabelResponse label;
     private LocalDateTime transactionDate;
     private Double amount;
     private String description;
     private Double balance;
 
-    public TransactionResponse(Integer id, UserSimple user, String hashcode, TransactionGroupResponse transactionGroupResponse, Label label, LocalDateTime transactionDate, Double amount, String description, Double balance) {
+    public TransactionResponse(Integer id, UserSimple user, String hashcode, TransactionGroupResponse transactionGroupResponse, LabelResponse label, LocalDateTime transactionDate, Double amount, String description, Double balance) {
         this.id = id;
         this.user = user;
         this.hashcode = hashcode;
@@ -36,14 +36,6 @@ public class TransactionResponse {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public TransactionGroupResponse getTransactionGroupResponse() {
-        return transactionGroupResponse;
-    }
-
-    public void setTransactionGroupResponse(TransactionGroupResponse transactionGroupResponse) {
-        this.transactionGroupResponse = transactionGroupResponse;
     }
 
     public UserSimple getUser() {
@@ -70,11 +62,11 @@ public class TransactionResponse {
         this.transactionGroupResponse = transactionGroupResponse;
     }
 
-    public Label getLabel() {
+    public LabelResponse getLabel() {
         return label;
     }
 
-    public void setLabel(Label label) {
+    public void setLabel(LabelResponse label) {
         this.label = label;
     }
 
