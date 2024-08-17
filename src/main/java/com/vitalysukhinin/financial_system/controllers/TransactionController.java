@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -72,6 +73,16 @@ public class TransactionController {
                 .body(pdfBytes);
     }
 
+    @PostMapping(path = "/parse")
+    public ResponseEntity<String> parseTransactions(@RequestParam("file") MultipartFile file, Authentication authentication) {
+        try {
+            transactionService.parseTransactions(file, authentication.getName());
+            return ResponseEntity.ok("Successfully parsed transactions");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to parse transactions: " + e.getMessage());
+        }
+    }
+
     @PutMapping
     public ResponseEntity<Transaction> updateTransaction(@RequestBody Transaction transaction) {
         Optional<Transaction> result = transactionService.updateTransaction(transaction);
@@ -86,6 +97,4 @@ public class TransactionController {
         transactionService.deleteTransaction(id);
         return ResponseEntity.ok().build();
     }
-
-
 }

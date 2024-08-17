@@ -1,0 +1,5 @@
+TRANSACTION_GROUP,LABEL,TRANSACTION_DATE,AMOUNT,DESCRIPTION,TYPE
+Salary,Marriage,08-17-2024 00:15:00,255.55,test,Income
+Salary,Marriage,08-17-2024 02:15:00,1255.55,test1,Income
+Salary,Marriage,08-17-2024 05:15:00,3255.55,test2,Income
+Salary,Marriage,08-17-2024 10:15:00,5255.55,test3,Income

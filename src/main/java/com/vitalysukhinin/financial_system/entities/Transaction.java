@@ -39,9 +39,8 @@ public class Transaction {
     @JoinColumn(name = "type_id")
     private TransactionType type;
 
-    public Transaction(Integer id, User user, String hashcode, TransactionGroup transactionGroup, Label label,
-                       LocalDateTime createdAt, Double amount, String description, Double balance, LocalDateTime transactionDate) {
-        this.id = id;
+    public Transaction(User user, String hashcode, TransactionGroup transactionGroup, Label label,
+                       LocalDateTime createdAt, Double amount, String description, LocalDateTime transactionDate, TransactionType type) {
         this.user = user;
         this.hashcode = hashcode;
         this.transactionGroup = transactionGroup;
@@ -49,8 +48,8 @@ public class Transaction {
         this.createdAt = createdAt;
         this.amount = amount;
         this.description = description;
-        this.balance = balance;
         this.transactionDate = transactionDate;
+        this.type = type;
     }
 
     public Transaction() {

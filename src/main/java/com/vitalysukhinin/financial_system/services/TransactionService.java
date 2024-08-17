@@ -1,5 +1,6 @@
 package com.vitalysukhinin.financial_system.services;
 
+import com.vitalysukhinin.financial_system.components.ParserFactory;
 import com.vitalysukhinin.financial_system.dto.*;
 import com.vitalysukhinin.financial_system.entities.*;
 import com.vitalysukhinin.financial_system.repositories.*;
@@ -8,7 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -21,17 +24,19 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final LabelRepository labelRepository;
-    private final TransactionGroupRepository transactionGroupRepository;
     private final PdfGenerationService pdfGenerationService;
     private final TransactionTypeRepository transactionTypeRepository;
+    private final TransactionGroupRepository transactionGroupRepository;
+    private final ParserFactory parserFactory;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, TransactionGroupRepository transactionGroupRepository, PdfGenerationService pdfGenerationService, TransactionTypeRepository transactionTypeRepository) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, PdfGenerationService pdfGenerationService, TransactionTypeRepository transactionTypeRepository, TransactionGroupRepository transactionGroupRepository, ParserFactory parserFactory) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.labelRepository = labelRepository;
-        this.transactionGroupRepository = transactionGroupRepository;
         this.pdfGenerationService = pdfGenerationService;
         this.transactionTypeRepository = transactionTypeRepository;
+        this.transactionGroupRepository = transactionGroupRepository;
+        this.parserFactory = parserFactory;
     }
 
     public Optional<Transaction> addTransaction(Transaction transaction) {
@@ -86,7 +91,7 @@ public class TransactionService {
 
     public CustomPage<TransactionResponse> getTransactions(String email, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName, Boolean all, Pageable pageable) {
         User user = userRepository.findByEmail(email).orElse(null);
-        TransactionGroup group = findGroupByName(groupName, email);
+        TransactionGroup group = transactionGroupRepository.findByNameAndUserOrNoUser(groupName, user).orElse(null);
         Label label = labelRepository.findByName(labelName).orElse(null);
         TransactionType type = transactionTypeRepository.findById(typeId == null ? -1 : typeId).orElse(null);
         Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
@@ -136,7 +141,7 @@ public class TransactionService {
     }
 
     public List<Transaction> getTransactions(User user, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName) {
-        TransactionGroup group = findGroupByName(groupName, user.getEmail());
+        TransactionGroup group = transactionGroupRepository.findByNameAndUserOrNoUser(groupName, user).orElse(null);
         Label label = labelRepository.findByName(labelName).orElse(null);
         TransactionType type = transactionTypeRepository.findById(typeId).orElse(null);
         Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
@@ -151,17 +156,10 @@ public class TransactionService {
         return pdfGenerationService.generateUserTransactionPdf(user, transactions);
     }
 
-    private TransactionGroup findGroupByName(String name, String email) {
-        TransactionGroup group = null;
-        List<TransactionGroup> groups = transactionGroupRepository.findAllByName(name);
-        if (!groups.isEmpty()) {
-            for (TransactionGroup transactionGroup : groups) {
-                if (transactionGroup.getUser() == null || transactionGroup.getUser().getEmail().equals(email)) {
-                    group = transactionGroup;
-                    break;
-                }
-            }
-        }
-        return group;
+    public void parseTransactions(MultipartFile file, String email) throws IOException {
+        String fileName = file.getOriginalFilename();
+        TransactionParser parser = parserFactory.getTransactionParser(fileName.substring(fileName.lastIndexOf(".") + 1));
+        List<Transaction> transactions = parser.parse(file.getInputStream(), email);
+        transactionRepository.saveAll(transactions);
     }
 }
