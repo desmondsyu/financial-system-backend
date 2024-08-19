@@ -45,12 +45,14 @@ public class TransactionService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             transaction.setUser(user);
-            User transactionGroupUser;
-            if (transaction.getTransactionGroup().getUser() == null)
-                transactionGroupUser = null;
-            else
-                transactionGroupUser = user;
-            transaction.getTransactionGroup().setUser(transactionGroupUser);
+            if (transaction.getTransactionGroup() != null) {
+                User transactionGroupUser;
+                if (transaction.getTransactionGroup().getUser() == null)
+                    transactionGroupUser = null;
+                else
+                    transactionGroupUser = user;
+                transaction.getTransactionGroup().setUser(transactionGroupUser);
+            }
             transaction.setCreatedAt(LocalDateTime.now());
             transaction.setHashcode(
                     String.valueOf(Objects.hash(transaction.getUser(),
@@ -60,12 +62,14 @@ public class TransactionService {
                             transaction.getDescription(),
                             transaction.getLabel()))
             );
-            User transactionLabelUser;
-            if (transaction.getLabel().getUser() == null)
-                transactionLabelUser = null;
-            else
-                transactionLabelUser = user;
-            transaction.getLabel().setUser(transactionLabelUser);
+            if (transaction.getLabel() != null) {
+                User transactionLabelUser;
+                if (transaction.getLabel().getUser() == null)
+                    transactionLabelUser = null;
+                else
+                    transactionLabelUser = user;
+                transaction.getLabel().setUser(transactionLabelUser);
+            }
             Transaction savedTransaction = transactionRepository.save(transaction);
             result = Optional.of(savedTransaction);
         }
@@ -143,7 +147,7 @@ public class TransactionService {
     public List<Transaction> getTransactions(User user, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName) {
         TransactionGroup group = transactionGroupRepository.findByNameAndUserOrNoUser(groupName, user).orElse(null);
         Label label = labelRepository.findByName(labelName).orElse(null);
-        TransactionType type = transactionTypeRepository.findById(typeId).orElse(null);
+        TransactionType type = typeId != null ? transactionTypeRepository.findById(typeId).orElse(null) : null;
         Specification<Transaction> specification = TransactionSearchFilter.filters(user, from, to, label, type, group);
         List<Transaction> transactions = transactionRepository.findAll(specification);
         return transactions;

@@ -10,9 +10,7 @@ import com.vitalysukhinin.financial_system.entities.Transaction;
 import com.vitalysukhinin.financial_system.entities.User;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -40,9 +38,9 @@ public class PdfGenerationService {
 
             for (Transaction transaction : transactions) {
                 table.addCell(transaction.getTransactionDate().format(formatter));
-                table.addCell(transaction.getDescription());
+                table.addCell(transaction.getDescription() == null ? "" : transaction.getDescription());
                 table.addCell(transaction.getAmount().toString());
-                table.addCell(transaction.getBalance().toString());
+                table.addCell(transaction.getBalance() == null ? "" : transaction.getBalance().toString());
             }
 
             document.add(table);
