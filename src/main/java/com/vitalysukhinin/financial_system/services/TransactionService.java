@@ -1,6 +1,7 @@
 package com.vitalysukhinin.financial_system.services;
 
 import com.vitalysukhinin.financial_system.components.ParserFactory;
+import com.vitalysukhinin.financial_system.components.TransactionParseResult;
 import com.vitalysukhinin.financial_system.dto.*;
 import com.vitalysukhinin.financial_system.entities.*;
 import com.vitalysukhinin.financial_system.repositories.*;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 @Transactional
@@ -28,8 +28,9 @@ public class TransactionService {
     private final TransactionTypeRepository transactionTypeRepository;
     private final TransactionGroupRepository transactionGroupRepository;
     private final ParserFactory parserFactory;
+    private final TransactionConverterService transactionConverterService;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, PdfGenerationService pdfGenerationService, TransactionTypeRepository transactionTypeRepository, TransactionGroupRepository transactionGroupRepository, ParserFactory parserFactory) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, PdfGenerationService pdfGenerationService, TransactionTypeRepository transactionTypeRepository, TransactionGroupRepository transactionGroupRepository, ParserFactory parserFactory, TransactionConverterService transactionConverterService) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.labelRepository = labelRepository;
@@ -37,6 +38,7 @@ public class TransactionService {
         this.transactionTypeRepository = transactionTypeRepository;
         this.transactionGroupRepository = transactionGroupRepository;
         this.parserFactory = parserFactory;
+        this.transactionConverterService = transactionConverterService;
     }
 
     public Optional<Transaction> addTransaction(Transaction transaction) {
@@ -104,11 +106,11 @@ public class TransactionService {
         boolean getAll = all == null ? false : all.booleanValue();
         if (getAll) {
             List<Transaction> transactions = transactionRepository.findAll(specification);
-            content = transactions.stream().map(convert()).toList();
+            content = transactions.stream().map(transactionConverterService.convertTransactionToResponse()).toList();
             response.setTotalElements(transactions.size());
         } else {
             Page<Transaction> transactions = transactionRepository.findAll(specification, pageable);
-            content = transactions.map(convert()).stream().toList();
+            content = transactions.map(transactionConverterService.convertTransactionToResponse()).stream().toList();
             response.setPageNumber(transactions.getNumber());
             response.setPageSize(transactions.getSize());
             response.setTotalElements(transactions.getTotalElements());
@@ -116,32 +118,6 @@ public class TransactionService {
         }
         response.setContent(content);
         return response;
-    }
-
-    private Function<Transaction, TransactionResponse> convert() {
-        return transaction -> new TransactionResponse(
-                transaction.getId(),
-                new UserSimple(transaction.getUser().getEmail()),
-                transaction.getHashcode(),
-                transaction.getTransactionGroup() == null ? null :
-                        new TransactionGroupResponse(
-                        transaction.getTransactionGroup().getId(),
-                        transaction.getTransactionGroup().getName(),
-                        transaction.getTransactionGroup().getTransactionType(),
-                        transaction.getTransactionGroup().getUser() == null ? null :
-                            new UserSimple(transaction.getTransactionGroup().getUser().getEmail())
-                ),
-                transaction.getLabel() == null ? null :
-                        new LabelResponse(transaction.getLabel().getId(),
-                        transaction.getLabel().getName(),
-                        transaction.getLabel().getUser() == null ? null :
-                            new UserSimple(transaction.getLabel().getUser().getEmail())),
-                transaction.getTransactionDate(),
-                transaction.getAmount(),
-                transaction.getDescription(),
-                transaction.getBalance(),
-                transaction.getType()
-        );
     }
 
     public List<Transaction> getTransactions(User user, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName) {
@@ -160,10 +136,17 @@ public class TransactionService {
         return pdfGenerationService.generateUserTransactionPdf(user, transactions);
     }
 
-    public void parseTransactions(MultipartFile file, String email) throws IOException {
+    public TransactionParseResultResponse parseTransactions(MultipartFile file, String email) throws IOException {
         String fileName = file.getOriginalFilename();
         TransactionParser parser = parserFactory.getTransactionParser(fileName.substring(fileName.lastIndexOf(".") + 1));
-        List<Transaction> transactions = parser.parse(file.getInputStream(), email);
-        transactionRepository.saveAll(transactions);
+        TransactionParseResult result = parser.parse(file.getInputStream(), email);
+        transactionRepository.saveAll(result.successfulTransactions());
+        return new TransactionParseResultResponse(
+                result.successfulTransactions()
+                        .stream()
+                        .map(transactionConverterService.convertTransactionToResponse())
+                        .toList(),
+                result.failedTransactions()
+        );
     }
 }

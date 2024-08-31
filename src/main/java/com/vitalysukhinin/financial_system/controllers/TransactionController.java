@@ -1,6 +1,7 @@
 package com.vitalysukhinin.financial_system.controllers;
 
 import com.vitalysukhinin.financial_system.dto.CustomPage;
+import com.vitalysukhinin.financial_system.dto.TransactionParseResultResponse;
 import com.vitalysukhinin.financial_system.dto.TransactionResponse;
 import com.vitalysukhinin.financial_system.entities.Transaction;
 import com.vitalysukhinin.financial_system.services.TransactionService;
@@ -74,12 +75,12 @@ public class TransactionController {
     }
 
     @PostMapping(path = "/parse")
-    public ResponseEntity<String> parseTransactions(@RequestParam("file") MultipartFile file, Authentication authentication) {
+    public ResponseEntity<TransactionParseResultResponse> parseTransactions(@RequestParam("file") MultipartFile file, Authentication authentication) {
         try {
-            transactionService.parseTransactions(file, authentication.getName());
-            return ResponseEntity.ok("Successfully parsed transactions");
+            TransactionParseResultResponse result = transactionService.parseTransactions(file, authentication.getName());
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to parse transactions: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 

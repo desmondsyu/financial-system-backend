@@ -16,7 +16,7 @@ public class LocalDateTimeConverter extends AbstractBeanField<LocalDateTime, Str
         try {
             return LocalDateTime.parse(s, formatter);
         } catch (DateTimeParseException e) {
-            return LocalDateTime.now();
+            return null;
         }
     }
 }

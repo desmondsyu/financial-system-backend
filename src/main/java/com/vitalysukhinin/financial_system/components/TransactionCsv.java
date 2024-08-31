@@ -1,4 +1,4 @@
-package com.vitalysukhinin.financial_system.dto;
+package com.vitalysukhinin.financial_system.components;
 
 import com.opencsv.bean.CsvBindByPosition;
 import com.opencsv.bean.CsvCustomBindByPosition;
