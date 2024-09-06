@@ -1,5 +1,6 @@
 package com.vitalysukhinin.financial_system.controllers;
 
+import com.vitalysukhinin.financial_system.configs.CustomUserDetailsService;
 import com.vitalysukhinin.financial_system.dto.CustomPage;
 import com.vitalysukhinin.financial_system.dto.TransactionParseResultResponse;
 import com.vitalysukhinin.financial_system.dto.TransactionResponse;
@@ -16,12 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/transactions")
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private static final Logger logger = Logger.getLogger(TransactionController.class.getName());
 
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
@@ -77,9 +80,12 @@ public class TransactionController {
     @PostMapping(path = "/parse")
     public ResponseEntity<TransactionParseResultResponse> parseTransactions(@RequestParam("file") MultipartFile file, Authentication authentication) {
         try {
+            logger.info(authentication.getName());
+            logger.info(file.getOriginalFilename());
             TransactionParseResultResponse result = transactionService.parseTransactions(file, authentication.getName());
             return ResponseEntity.ok(result);
         } catch (Exception e) {
+            logger.info(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

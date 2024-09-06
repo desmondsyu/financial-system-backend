@@ -71,7 +71,7 @@ public class CsvParser implements TransactionParser{
                     continue;
                 }
 
-                if (transactionCsv.getAmount() <= 0) {
+                if (transactionCsv.getAmount() == 0) {
                     failedTransactions.add(new FailedTransaction(i + 1, "Amount should be greater than zero"));
                     continue;
                 }

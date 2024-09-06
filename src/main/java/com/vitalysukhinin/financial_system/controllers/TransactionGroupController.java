@@ -41,15 +41,20 @@ public class TransactionGroupController {
     }
 
     @PostMapping
-    public ResponseEntity<TransactionGroup> createTransactionGroup(@RequestBody TransactionGroup transactionGroup) {
+    public ResponseEntity<String> createTransactionGroup(@RequestBody TransactionGroup transactionGroup) {
 
-        Optional<User> user = userRepository.findByEmail(transactionGroup.getUser().getEmail());
-        if (user.isPresent()) {
-            transactionGroup.setUser(user.get());
-            TransactionGroup savedTransactionGroup = transactionGroupRepository.save(transactionGroup);
-            return ResponseEntity.ok(savedTransactionGroup);
+        Optional<User> userOptional = userRepository.findByEmail(transactionGroup.getUser().getEmail());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            transactionGroup.setUser(user);
+            Optional<TransactionGroup> existingGroup = transactionGroupRepository.findByNameAndUserOrNoUser(transactionGroup.getName(), user);
+            if (existingGroup.isPresent()) {
+                return ResponseEntity.badRequest().body("Transaction group already exists");
+            }
+            transactionGroupRepository.save(transactionGroup);
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body("User does not exist");
     }
 
     @DeleteMapping(path = "/{id}")
