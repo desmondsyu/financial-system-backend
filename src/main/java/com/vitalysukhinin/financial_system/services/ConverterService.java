@@ -1,16 +1,14 @@
 package com.vitalysukhinin.financial_system.services;
 
-import com.vitalysukhinin.financial_system.dto.LabelResponse;
-import com.vitalysukhinin.financial_system.dto.TransactionGroupResponse;
-import com.vitalysukhinin.financial_system.dto.TransactionResponse;
-import com.vitalysukhinin.financial_system.dto.UserSimple;
+import com.vitalysukhinin.financial_system.dto.*;
+import com.vitalysukhinin.financial_system.entities.RecurringTransaction;
 import com.vitalysukhinin.financial_system.entities.Transaction;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
 @Service
-public class TransactionConverterService {
+public class ConverterService {
 
     public Function<Transaction, TransactionResponse> convertTransactionToResponse() {
         return transaction -> new TransactionResponse(
@@ -35,6 +33,15 @@ public class TransactionConverterService {
                 transaction.getDescription(),
                 transaction.getBalance(),
                 transaction.getType()
+        );
+    }
+
+    public Function<RecurringTransaction, RecurringTransactionResponse> convertRecurringTransactionToResponse() {
+        return transaction -> new RecurringTransactionResponse(
+                transaction.getId(),
+                convertTransactionToResponse().apply(transaction.getTransaction()),
+                transaction.getFrequency(),
+                transaction.getEndDate()
         );
     }
 }

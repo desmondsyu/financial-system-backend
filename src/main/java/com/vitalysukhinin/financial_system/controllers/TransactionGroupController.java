@@ -40,6 +40,7 @@ public class TransactionGroupController {
              return ResponseEntity.notFound().build();
     }
 
+    // TODO: Make all letters in group and label lowercase
     @PostMapping
     public ResponseEntity<String> createTransactionGroup(@RequestBody TransactionGroup transactionGroup) {
 

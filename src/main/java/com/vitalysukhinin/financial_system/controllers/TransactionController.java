@@ -1,10 +1,10 @@
 package com.vitalysukhinin.financial_system.controllers;
 
-import com.vitalysukhinin.financial_system.configs.CustomUserDetailsService;
 import com.vitalysukhinin.financial_system.dto.CustomPage;
 import com.vitalysukhinin.financial_system.dto.TransactionParseResultResponse;
 import com.vitalysukhinin.financial_system.dto.TransactionResponse;
 import com.vitalysukhinin.financial_system.entities.Transaction;
+import com.vitalysukhinin.financial_system.services.ConverterService;
 import com.vitalysukhinin.financial_system.services.TransactionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,16 +25,19 @@ public class TransactionController {
 
     private final TransactionService transactionService;
     private static final Logger logger = Logger.getLogger(TransactionController.class.getName());
+    private final ConverterService converterService;
 
-    public TransactionController(TransactionService transactionService) {
+    public TransactionController(TransactionService transactionService, ConverterService converterService) {
         this.transactionService = transactionService;
+        this.converterService = converterService;
     }
 
     @PostMapping
-    public ResponseEntity<Void> createTransaction(@RequestBody Transaction transaction) {
+    public ResponseEntity<TransactionResponse> createTransaction(@RequestBody Transaction transaction) {
         Optional<Transaction> result = transactionService.addTransaction(transaction);
         if (result.isPresent()) {
-            return ResponseEntity.ok().build();
+            TransactionResponse transactionResponse = converterService.convertTransactionToResponse().apply(result.get());
+            return ResponseEntity.ok(transactionResponse);
         }
         return ResponseEntity.badRequest().build();
     }

@@ -1,6 +1,5 @@
 package com.vitalysukhinin.financial_system.dto;
 
-import com.vitalysukhinin.financial_system.entities.Label;
 import com.vitalysukhinin.financial_system.entities.TransactionType;
 
 import java.time.LocalDateTime;

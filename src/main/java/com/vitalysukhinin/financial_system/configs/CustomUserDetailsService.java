@@ -20,10 +20,8 @@ public class CustomUserDetailsService extends JdbcDaoImpl implements UserDetails
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.info("Attempting to load user by username: " + username);
         try {
             UserDetails user = super.loadUserByUsername(username);
-            logger.info("User loaded successfully: " + user);
             return user;
         } catch (UsernameNotFoundException e) {
             logger.severe("User not found: " + e.getMessage());

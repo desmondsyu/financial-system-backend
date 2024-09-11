@@ -28,9 +28,9 @@ public class TransactionService {
     private final TransactionTypeRepository transactionTypeRepository;
     private final TransactionGroupRepository transactionGroupRepository;
     private final ParserFactory parserFactory;
-    private final TransactionConverterService transactionConverterService;
+    private final ConverterService converterService;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, PdfGenerationService pdfGenerationService, TransactionTypeRepository transactionTypeRepository, TransactionGroupRepository transactionGroupRepository, ParserFactory parserFactory, TransactionConverterService transactionConverterService) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, LabelRepository labelRepository, PdfGenerationService pdfGenerationService, TransactionTypeRepository transactionTypeRepository, TransactionGroupRepository transactionGroupRepository, ParserFactory parserFactory, ConverterService converterService) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.labelRepository = labelRepository;
@@ -38,7 +38,7 @@ public class TransactionService {
         this.transactionTypeRepository = transactionTypeRepository;
         this.transactionGroupRepository = transactionGroupRepository;
         this.parserFactory = parserFactory;
-        this.transactionConverterService = transactionConverterService;
+        this.converterService = converterService;
     }
 
     public Optional<Transaction> addTransaction(Transaction transaction) {
@@ -56,14 +56,7 @@ public class TransactionService {
                 transaction.getTransactionGroup().setUser(transactionGroupUser);
             }
             transaction.setCreatedAt(LocalDateTime.now());
-            transaction.setHashcode(
-                    String.valueOf(Objects.hash(transaction.getUser(),
-                            transaction.getTransactionDate(),
-                            transaction.getCreatedAt(),
-                            transaction.getAmount(),
-                            transaction.getDescription(),
-                            transaction.getLabel()))
-            );
+            transaction.setHashcode(generateHashcode(transaction));
             if (transaction.getLabel() != null) {
                 User transactionLabelUser;
                 if (transaction.getLabel().getUser() == null)
@@ -95,6 +88,15 @@ public class TransactionService {
         return result;
     }
 
+    public String generateHashcode(Transaction transaction) {
+        return String.valueOf(Objects.hash(transaction.getUser(),
+                transaction.getTransactionDate(),
+                transaction.getAmount(),
+                transaction.getDescription(),
+                transaction.getTransactionGroup(),
+                transaction.getLabel()));
+    }
+
     public CustomPage<TransactionResponse> getTransactions(String email, LocalDateTime from, LocalDateTime to, String labelName, Integer typeId, String groupName, Boolean all, Pageable pageable) {
         User user = userRepository.findByEmail(email).orElse(null);
         TransactionGroup group = transactionGroupRepository.findByNameAndUserOrNoUser(groupName, user).orElse(null);
@@ -106,11 +108,11 @@ public class TransactionService {
         boolean getAll = all == null ? false : all.booleanValue();
         if (getAll) {
             List<Transaction> transactions = transactionRepository.findAll(specification);
-            content = transactions.stream().map(transactionConverterService.convertTransactionToResponse()).toList();
+            content = transactions.stream().map(converterService.convertTransactionToResponse()).toList();
             response.setTotalElements(transactions.size());
         } else {
             Page<Transaction> transactions = transactionRepository.findAll(specification, pageable);
-            content = transactions.map(transactionConverterService.convertTransactionToResponse()).stream().toList();
+            content = transactions.map(converterService.convertTransactionToResponse()).stream().toList();
             response.setPageNumber(transactions.getNumber());
             response.setPageSize(transactions.getSize());
             response.setTotalElements(transactions.getTotalElements());
@@ -144,7 +146,7 @@ public class TransactionService {
         return new TransactionParseResultResponse(
                 result.successfulTransactions()
                         .stream()
-                        .map(transactionConverterService.convertTransactionToResponse())
+                        .map(converterService.convertTransactionToResponse())
                         .toList(),
                 result.failedTransactions()
         );

@@ -29,6 +29,7 @@ public class CsvParser implements TransactionParser{
         this.transactionRepository = transactionRepository;
     }
 
+    // TODO: Make all letters in group and label lowercase
     @Override
     public TransactionParseResult parse(InputStream input, String email) throws IOException {
         try (Reader reader = new InputStreamReader(input);
@@ -72,7 +73,7 @@ public class CsvParser implements TransactionParser{
                 }
 
                 if (transactionCsv.getAmount() == 0) {
-                    failedTransactions.add(new FailedTransaction(i + 1, "Amount should be greater than zero"));
+                    failedTransactions.add(new FailedTransaction(i + 1, "Amount should be not equal to zero"));
                     continue;
                 }
 

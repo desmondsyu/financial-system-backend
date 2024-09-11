@@ -25,7 +25,6 @@ public class LabelController {
         this.userRepository = userRepository;
     }
 
-    //TODO Add dto to hide user data
     @GetMapping
     public ResponseEntity<List<Label>> getLabels(Authentication auth) {
         String email = auth.getName();
@@ -45,6 +44,7 @@ public class LabelController {
             return ResponseEntity.notFound().build();
     }
 
+    // TODO: Make all letters in group and label lowercase
     @PostMapping
     public ResponseEntity<Label> createLabel(@RequestBody Label label) {
         Label createdLabel = labelRepository.save(label);
