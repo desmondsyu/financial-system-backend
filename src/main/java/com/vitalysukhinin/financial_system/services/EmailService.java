@@ -24,7 +24,7 @@ public class EmailService {
         sendEmail(to,
                 "Reset password",
                 "To reset password for financial system use following link: " +
-                        "http://localhost:3000/reset-password?token=" + code);
+                        "https://cashcalm.vercel.app/reset-password?token=" + code);
     }
 
     public void sendFeedbackEmail(FeedbackRequest feedback) {
