@@ -4,6 +4,7 @@ import com.vitalysukhinin.financial_system.entities.TempUser;
 import com.vitalysukhinin.financial_system.entities.User;
 import com.vitalysukhinin.financial_system.repositories.TempUserRepository;
 import com.vitalysukhinin.financial_system.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class VerificationService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public boolean verifyEmail(String email, String token) {
         Optional<TempUser> emailVerification = tempUserRepository.findByEmail(email);
         if (emailVerification.isPresent()) {

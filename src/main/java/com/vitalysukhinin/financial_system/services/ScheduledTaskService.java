@@ -3,6 +3,7 @@ package com.vitalysukhinin.financial_system.services;
 import com.vitalysukhinin.financial_system.entities.RecurringTransaction;
 import com.vitalysukhinin.financial_system.entities.Transaction;
 import com.vitalysukhinin.financial_system.repositories.RecurringTransactionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ public class ScheduledTaskService {
 
     // Every 1 minute
     @Scheduled(fixedRate = 1 * 60 * 1000)
+    @Transactional
     public void checkAndProcessRecurringTransactions() {
         List<RecurringTransaction> recurringTransactions = recurringTransactionService.getAll();
         for (RecurringTransaction recurringTransaction : recurringTransactions) {

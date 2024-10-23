@@ -41,6 +41,7 @@ public class TransactionService {
         this.converterService = converterService;
     }
 
+    @Transactional
     public Optional<Transaction> addTransaction(Transaction transaction) {
         Optional<Transaction> result = Optional.empty();
         Optional<User> optionalUser = userRepository.findByEmail(transaction.getUser().getEmail());
@@ -71,10 +72,12 @@ public class TransactionService {
         return result;
     }
 
+    @Transactional
     public void deleteTransaction(Integer id) {
         transactionRepository.deleteById(id);
     }
 
+    @Transactional
     public Optional<Transaction> updateTransaction(Transaction transaction) {
         Optional<Transaction> result = Optional.empty();
         Optional<User> optionalUser = userRepository.findByEmail(transaction.getUser().getEmail());
@@ -138,6 +141,7 @@ public class TransactionService {
         return pdfGenerationService.generateUserTransactionPdf(user, transactions);
     }
 
+    @Transactional
     public TransactionParseResultResponse parseTransactions(MultipartFile file, String email) throws IOException {
         String fileName = file.getOriginalFilename();
         TransactionParser parser = parserFactory.getTransactionParser(fileName.substring(fileName.lastIndexOf(".") + 1));

@@ -21,13 +21,13 @@ public class User {
     private boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<TransactionGroup> userTransactionGroupResponses;
+    private Set<TransactionGroup> transactionGroups;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Transaction> userTransactions;
+    private Set<Transaction> transactions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Label> userLabels;
+    private Set<Label> labels;
 
     public User(Integer id, String username, String password, LocalDateTime dob, String email, String gender, boolean active) {
         this.id = id;

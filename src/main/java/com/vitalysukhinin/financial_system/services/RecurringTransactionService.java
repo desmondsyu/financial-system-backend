@@ -6,6 +6,7 @@ import com.vitalysukhinin.financial_system.entities.User;
 import com.vitalysukhinin.financial_system.repositories.RecurringTransactionRepository;
 import com.vitalysukhinin.financial_system.repositories.TransactionRepository;
 import com.vitalysukhinin.financial_system.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class RecurringTransactionService {
         recurringTransactionRepository.deleteById(id);
     }
 
+    @Transactional
     public void update(RecurringTransaction transaction) {
         Optional<Transaction> transactionOptional = transactionRepository.findById(transaction.getTransaction().getId());
         if (transactionOptional.isPresent()) {
@@ -36,6 +38,7 @@ public class RecurringTransactionService {
         }
     }
 
+    @Transactional
     public Optional<RecurringTransaction> create(RecurringTransaction transaction) {
         Optional<Transaction> transactionOptional = transactionRepository.findById(transaction.getTransaction().getId());
         if (transactionOptional.isPresent()) {
@@ -46,6 +49,7 @@ public class RecurringTransactionService {
         return Optional.empty();
     }
 
+    @Transactional
     public List<RecurringTransaction> getAll(Authentication auth) {
         Optional<User> optionalUser = userRepository.findByEmail(auth.getName());
         if (optionalUser.isPresent())
